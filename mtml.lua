@@ -466,6 +466,8 @@ end
 
 
 ---Updates content on the page and wraps words to make text fit on the given terminal
+---Data is a table of the contents of all the text boxes
+---This function should be called with the page from `page_from_mtml` and should not have its ouput fed back into itself
 ---@param terminal term
 ---@param page table
 ---@param data table
