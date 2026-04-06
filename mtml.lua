@@ -585,13 +585,6 @@ function fill_line_end_with(ctx, line)
 end
 
 function add_button_pos(ctx, name, value)
-  --debug
-  local db_f = fs.open("debug.txt", "a")
-  local db_time = textutils.formatTime(os.time(), true)
-  db_f.writeLine("button pos")
-  db_f.writeLine(db_time)
-  db_f.writeLine(textutils.serialise(get_cursor_idx(ctx.term)))
-  
   local last_button = ctx.buttons:last() or {}
   local pos = get_cursor_idx(ctx.term)
   value = value or nil
