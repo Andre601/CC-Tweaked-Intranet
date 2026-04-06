@@ -466,8 +466,6 @@ end
 
 
 ---Updates content on the page and wraps words to make text fit on the given terminal
----Data is a table of the contents of all the text boxes
----This function should be called with the page from `page_from_mtml` and should not have its ouput fed back into itself
 ---@param terminal term
 ---@param page table
 ---@param data table
@@ -587,6 +585,13 @@ function fill_line_end_with(ctx, line)
 end
 
 function add_button_pos(ctx, name, value)
+  --debug
+  local db_f = fs.open("debug.txt", "a")
+  local db_time = textutils.formatTime(os.time(), true)
+  db_f.writeLine("button pos")
+  db_f.writeLine(db_time)
+  db_f.writeLine(textutils.serialise(get_cursor_idx(ctx.term)))
+  
   local last_button = ctx.buttons:last() or {}
   local pos = get_cursor_idx(ctx.term)
   value = value or nil
@@ -612,7 +617,7 @@ function mod.get_button_at(buttons, click_x, click_y)
   local idx =  (click_y - 1) * buttons.screen_width + click_x
   local found_button = {}
   for _, button in ipairs(buttons) do
-    if idx <= button.pos then found_button = shallow_copy_table(button) end
+    if idx >= button.pos then found_button = shallow_copy_table(button) end
   end
   found_button.pos = nil
   for _, _ in pairs(found_button) do
