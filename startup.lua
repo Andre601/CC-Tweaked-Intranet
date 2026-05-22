@@ -1,5 +1,5 @@
-local keywords = {} --keywords here
-local display_name = nil --display name here
+local keywords = {}
+local display_name = "Display name"
 local desc = [[
 Your server description here.
 ]]
@@ -182,6 +182,25 @@ while true do
                 
     elseif message[1] == "button_press" then
         print(id, message[2])
+	local button_input = message[2]
+	local input_id = button_input
+	local input_value = true
+			
+	print(id, button_input, "pressed")
+
+	local addon = addon_inputs[input_id]
+
+	if addon and addon.receive_input then
+	    addon_output = addon.receive_input(id, input_id, input_value)
+	    if type(addon_output) == "string" then
+		rednet.send(id, {"page", addon_output}, "intranet")
+	    end
+
+		
+	end
+
+
+
     elseif message[1] == "textbox_input" then
 	local textbox_input = message[2]
 	local input_id = textbox_input[1]
