@@ -16,8 +16,10 @@ local address = nil
 local browsing_history = {" Browsing history:"}
 local buttons = nil
 local site_id = nil
- 
-scroll_offset = 0
+
+local writing = false
+   
+scroll_offset = 1
  
 local function send_message(id, type, message)
     if (id == nil) or (not id) then
@@ -130,7 +132,7 @@ end
  
 local function address_bar(address)
  
- 
+    scroll_offset = 1
     term.redirect(original_term)
     header()
     if index then
@@ -219,7 +221,10 @@ header()
 local function keystrokes()
 while true do
     local event, key = os.pullEvent("key")
-        
+    
+    if writing == true then key = nil end    
+            
+                    
     if key == keys.h then
         
     elseif key == keys.r then
@@ -258,7 +263,7 @@ while true do
     elseif key == keys.pageUp then
         if scroll_offset > 18 then 
             scroll_offset = scroll_offset - 18
-        else scroll_offset = 0 end
+        else scroll_offset = 1 end
             
         term.redirect(page_window)
     	mtml.render_page(page_window, parsed_mtml, scroll_offset)
@@ -281,10 +286,10 @@ end
 
 local function mouse_click()
     while true do
-        local event, button, x, y = os.pullEvent("mouse_click")
-        if x > 11 and y > 2 then
-            x = x - 11
-            y = y - 2
+        local event, button, px, py = os.pullEvent("mouse_click")
+        if px > 11 and py > 2 then
+            x = px - 11
+            y = py - 2 + scroll_offset - 1
             
             --debug
             --write((y-1)*40+x)
@@ -297,6 +302,29 @@ local function mouse_click()
                 elseif pressed and pressed.link ~= nil then
                     print(pressed.link)
                     address_bar(pressed.link)
+                elseif pressed and pressed.textbox ~= nil then
+                    
+                    term.setCursorPos(px,py)
+                    writing = true
+                    local textbox_input = nil 
+                    local textbox_input = read()
+                    local payload = {pressed.textbox, textbox_input}
+                    send_message(site_id, "textbox_input", payload)
+                    writing = false
+                    local response_payload = nil
+                    local response_id, response_payload = rednet.receive("intranet", 5)
+                    if response_payload then
+                    if response_payload[2] then
+                        response_page = response_payload[2]
+                        response_payload = nil
+                    
+                        parsed_mtml, err = mtml.page_from_mtml(response_page)
+                        
+                        term.redirect(page_window)
+                        buttons = mtml.render_page(page_window, parsed_mtml, scroll_offset)
+                        term.redirect(original_term)
+                    end
+                    end
                 end
             end
             

@@ -4,12 +4,18 @@ if os.getComputerLabel() == nil then
 	os.setComputerLabel(hostname)
 end
 
+local keywords = {}
+
 hostname = os.getComputerLabel()
 
 rednet.open("left")
 rednet.host("intranet", hostname)
 
 local PAGE_DIR = "pages"
+local ADDON_DIR = "addons"
+
+local addons = {}
+local addon_inputs = {}
 
 local pages = {}
 local colors = {}
@@ -55,8 +61,53 @@ local function gui()
     term.redirect(log_window)
 
 end
+
+local function loadAddons()
+    addons = {}
+    addon_inputs = {}
+
+    if not fs.exists(ADDON_DIR) then
+        fs.makeDir(ADDON_DIR)
+    end
+
+    for _, file in ipairs(fs.list(ADDON_DIR)) do
+        if file:sub(-4) == ".lua" then
+            local addon_name = file:sub(1, -5)
+            local require_path = ADDON_DIR .. "." .. addon_name
+
+            local ok, addon = pcall(require, require_path)
+
+            if ok and type(addon) == "table" then
+                addons[addon_name] = addon
+                print("Loaded addon:", addon_name)
+
+                if type(addon.input) == "function" then
+                    local input_ok, inputs = pcall(addon.input)
+
+                    if input_ok and type(inputs) == "table" then
+                        for input_id, _ in pairs(inputs) do
+                            addon_inputs[input_id] = addon
+                        end
+
+                        print("Loaded inputs for addon:", addon_name)
+                    else
+                        printError("Addon input() failed: " .. addon_name)
+                        if not input_ok then
+                            printError(inputs)
+                        end
+                    end
+                end
+            else
+                printError("Failed to load addon: " .. addon_name)
+                printError(addon)
+            end
+        end
+    end
+end
+
 gui()
 loadPages()
+loadAddons()
 
 
 print("Intranet server active. Pages loaded:", #index)
@@ -117,13 +168,33 @@ while true do
         local request = message[2]
         -- starts function page_request with pars
         page_request(id, request)
-        
+    elseif message[1] == "indexer" then
+        local page_name = os.getComputerLabel()
+        local page_index = {page_name, keywords}
+        rednet.send(id, page_index, "intranet")
+                
     elseif message[1] == "button_press" then
         print(id, message[2])
+    elseif message[1] == "textbox_input" then
+	local textbox_input = message[2]
+	local input_id = textbox_input[1]
+	local input_value = textbox_input[2]
+			
+	print(id, textbox_input[1], textbox_input[2])
+
+	local addon = addon_inputs[input_id]
+
+	if addon and addon.receive_input then
+	    addon_output = addon.receive_input(id, input_id, input_value)
+	    if type(addon_output) == "string" then
+		rednet.send(id, {"page", addon_output}, "intranet")
+	    end
+
+		
+	end
     end
 end
 end
-
 
 
 local function keystrokes()
