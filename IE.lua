@@ -233,7 +233,7 @@ while true do
         write_index()
         
         term.redirect(page_window)
-        mtml.render_page(page_window, parsed_mtml, scroll_offset)
+        buttons = mtml.render_page(page_window, parsed_mtml, scroll_offset)
         term.redirect(original_term)
         
     elseif key == keys.x then
@@ -248,7 +248,7 @@ while true do
             scroll_offset = scroll_offset - 1
             
         	term.redirect(page_window)
-    		mtml.render_page(page_window, parsed_mtml, scroll_offset)
+    		buttons = mtml.render_page(page_window, parsed_mtml, scroll_offset)
    			term.redirect(original_term)
             
         end
@@ -257,23 +257,23 @@ while true do
         scroll_offset = scroll_offset + 1
             
         term.redirect(page_window)
-    	mtml.render_page(page_window, parsed_mtml, scroll_offset)
+    	buttons = mtml.render_page(page_window, parsed_mtml, scroll_offset)
    		term.redirect(original_term)
             
     elseif key == keys.pageUp then
-        if scroll_offset > 18 then 
-            scroll_offset = scroll_offset - 18
+        if scroll_offset > 16 then 
+            scroll_offset = scroll_offset - 16
         else scroll_offset = 1 end
             
         term.redirect(page_window)
-    	mtml.render_page(page_window, parsed_mtml, scroll_offset)
+    	buttons = mtml.render_page(page_window, parsed_mtml, scroll_offset)
    		term.redirect(original_term)
             
     elseif key == keys.pageDown then
         scroll_offset = scroll_offset + 18
             
         term.redirect(page_window)
-    	mtml.render_page(page_window, parsed_mtml, scroll_offset)
+    	buttons = mtml.render_page(page_window, parsed_mtml, scroll_offset)
    		term.redirect(original_term)
     
     elseif key == keys.grave then
