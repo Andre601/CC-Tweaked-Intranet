@@ -1,10 +1,17 @@
+local keywords = {} --keywords here
+local display_name = nil --display name here
+local desc = [[
+Your server description here.
+]]
+
+--------------------------------------------------
 if os.getComputerLabel() == nil then
 	print("Please enter hostname:")
 	local hostname = read()
 	os.setComputerLabel(hostname)
 end
 
-local keywords = {}
+
 
 hostname = os.getComputerLabel()
 
@@ -170,7 +177,7 @@ while true do
         page_request(id, request)
     elseif message[1] == "indexer" then
         local page_name = os.getComputerLabel()
-        local page_index = {page_name, keywords}
+        local page_index = {page_name, keywords, display_name, desc}
         rednet.send(id, page_index, "intranet")
                 
     elseif message[1] == "button_press" then

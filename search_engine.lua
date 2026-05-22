@@ -12,8 +12,10 @@ Goggles
 ]]
 local result_template =
 [[
-<link src="NAME">NAME</link>
-    Ponder score: DISTANCE
+DISPLAY
+  <link src="NAME">NAME</link>
+  DESC
+  Ponder score: DISTANCE
     
 ]]
 
@@ -53,7 +55,7 @@ function indexer()
     end
 end
 function search(query)
-    local unsorted = {}
+
     local results = {}
 
     query = string.lower(tostring(query or ""))
@@ -65,6 +67,8 @@ function search(query)
         if type(server_data) == "table" then
             local server_name = tostring(server_data[1])
             local keywords = server_data[2] or {}
+            local display_name = server_data[3] or server_name
+            local desc = server_data[4] or " "
 
             local server_name_lower = string.lower(server_name)
 
@@ -84,23 +88,20 @@ function search(query)
                 distance = 0
             end
 
-            table.insert(unsorted, {
+            table.insert(results, {
                 name = server_name,
-                distance = distance
+                distance = distance,
+                display_name = display_name,
+                desc = desc
             })
         end
     end
 
-    table.sort(unsorted, function(a, b)
+    table.sort(results, function(a, b)
         return a.distance < b.distance
     end)
 
-    for _, item in ipairs(unsorted) do
-        table.insert(results, {
-            [item.name] = item.distance
-        })
-    end
-
+ 
     return results
 end
 
@@ -108,24 +109,18 @@ function build_result_page(results)
     local page = result_header
 
     for _, result in ipairs(results) do
-        for page_name, distance in pairs(result) do
-            local result_block = result_template
+        local result_block = result_template
 
-            result_block = result_block:gsub("NAME", function()
-                return tostring(page_name)
-            end)
-
-            result_block = result_block:gsub("DISTANCE", function()
-                return tostring(distance)
-            end)
-
-            page = page .. result_block
-        end
+        result_block = result_block:gsub("NAME", tostring(result.name))
+        result_block = result_block:gsub("DISTANCE", tostring(result.distance))
+        result_block = result_block:gsub("DISPLAY", tostring(result.display_name))
+        result_block = result_block:gsub("DESC", tostring(result.desc))
+    
+        page = page .. result_block
     end
 
     return page
 end
-
 --Compares two strings
 function string_distance(str1, str2)
 	local len1 = string.len(str1)
