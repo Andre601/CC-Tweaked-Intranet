@@ -1,5 +1,5 @@
 local SERVER_DATA_FILE = "server.dat"
-ter.redirect(term.native())
+term.redirect(term.native())
 local server_data = {}
 --[[ contains:
 address = 
