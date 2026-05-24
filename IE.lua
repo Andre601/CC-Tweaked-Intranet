@@ -1,6 +1,6 @@
 local mtml = require("mtml")
  
-rednet.open("left")
+peripheral.find("modem", rednet.open)
  
 --defined header
 original_term = term.current()
