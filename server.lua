@@ -300,7 +300,11 @@ local function process_admin(id, message)
     elseif message[1] == "reload" then
         reload()
         
-    elseif message[1] == "data_request" then
+	elseif message[1] == "reboot" then
+		os.reboot()
+	
+	
+	elseif message[1] == "data_request" then
         print("Sending server data")
         rednet.send(id, read_server_data(), "intranet_admin")
     
