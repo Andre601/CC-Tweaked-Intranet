@@ -82,7 +82,7 @@ It can have multiple lines.
     	elseif line:sub(1, 5) == "pass=" then
         	data.pass = line:sub(6)
         
-        elseif line:sub(1, 9) == "keywords" then
+        elseif line:sub(1, 9) == "keywords=" then
             local keyword_string = line:sub(10)
             for keyword in keyword_string:gmatch("[^,]+") do
                 keyword = keyword:match("^%s*(.-)%s*$")
