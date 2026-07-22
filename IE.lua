@@ -198,7 +198,7 @@ local function address_bar(address)
         table.insert(browsing_history, #browsing_history .. " | " .. textutils.formatTime(os.time()) .. " | " .. address)
     end
     --page_window = window.create(term.current(), 12,3,51,18)
-    local parsed_mtml, err = mtml.page_from_mtml(received_page)
+    parsed_mtml, err = mtml.page_from_mtml(received_page)
     
     if not parsed_mtml then
         printError(err)
@@ -280,9 +280,11 @@ local function keystrokes()
 end
 
 local function handle_button_response()
+    local response_payload = nil
     local _, response_payload = rednet.receive("intranet", 5)
     if type(response_payload) == "table" and response_payload[2] then
-        local parsed_mtml, err = mtml.page_from_mtml(response_payload[2])
+        local response_page = response_payload[2]
+        parsed_mtml, err = mtml.page_from_mtml(response_page)
 
         if not parsed_mtml then
             printError(err)
